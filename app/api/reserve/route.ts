@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase/client";
-import { writeClient } from "@/lib/sanity/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +10,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const { writeClient } = await import("@/lib/sanity/client");
+    const { supabaseAdmin } = await import("@/lib/supabase/client");
 
     // Vérifier que le produit est disponible dans Sanity
     const tapis = await writeClient.fetch(

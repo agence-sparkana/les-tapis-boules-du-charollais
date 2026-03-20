@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase/client";
-import { writeClient } from "@/lib/sanity/client";
 
-// Cron job Vercel : exécuté toutes les heures
+// Cron job Vercel : exécuté quotidiennement
 // Vérifie les réservations expirées (>48h) et les libère
 
 export async function GET(req: NextRequest) {
@@ -13,6 +11,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { supabaseAdmin } = await import("@/lib/supabase/client");
+    const { writeClient } = await import("@/lib/sanity/client");
+
     // Récupérer les réservations pending dont expires_at est passé
     const { data: expired, error } = await supabaseAdmin
       .from("reservations")

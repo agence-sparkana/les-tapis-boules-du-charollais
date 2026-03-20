@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-02-25.clover",
-});
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        { error: "Stripe non configuré" },
+        { status: 503 }
+      );
+    }
+
+    const Stripe = (await import("stripe")).default;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
     const { productId, productName, price } = await req.json();
 
     if (!productId || !productName || !price) {
@@ -30,7 +35,7 @@ export async function POST(req: NextRequest) {
               description: "Tapis en laine feutrée — Pièce unique",
               images: [`${siteUrl}/hero-tapis.jpg`],
             },
-            unit_amount: price * 100, // Stripe attend des centimes
+            unit_amount: price * 100,
           },
           quantity: 1,
         },
