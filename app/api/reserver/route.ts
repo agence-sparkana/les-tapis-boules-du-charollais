@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { client, writeClient } from "@/lib/sanity/client";
+
 interface ReserverRequest {
   tapisId: string;
   clientNom: string;
@@ -10,8 +10,10 @@ interface ReserverRequest {
 
 export async function POST(request: Request) {
   try {
+    const { client, writeClient } = await import("@/lib/sanity/client");
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
+
     const body: ReserverRequest = await request.json();
     const { tapisId, clientNom, clientEmail, clientTel, clientAdresse } = body;
 
@@ -22,7 +24,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Vérifier que le tapis est disponible
     const tapis = await client.fetch(
       `*[_type == "tapis" && _id == $id][0]{ _id, name, statut, prix, diametre }`,
       { id: tapisId }
@@ -39,11 +40,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Calculer reservedUntil = now + 48h
     const now = new Date();
     const reservedUntil = new Date(now.getTime() + 48 * 60 * 60 * 1000);
 
-    // 3. Patcher le document Sanity
     await writeClient
       .patch(tapisId)
       .set({
@@ -54,7 +53,6 @@ export async function POST(request: Request) {
       })
       .commit();
 
-    // 4. Formater le prix
     const priceFormatted = new Intl.NumberFormat("fr-FR", {
       style: "currency",
       currency: "EUR",
@@ -70,7 +68,6 @@ export async function POST(request: Request) {
       minute: "2-digit",
     });
 
-    // 5. Email à Madeleine
     const fromEmail = process.env.RESEND_FROM || "onboarding@resend.dev";
     const madeleineEmail = process.env.MADELEINE_EMAIL || "madeleinebenifei@gmail.com";
 
@@ -90,13 +87,11 @@ export async function POST(request: Request) {
           <li>Adresse : ${clientAdresse || "Non renseignée"}</li>
         </ul>
         <hr/>
-        <p>Le client doit effectuer son virement avant le <strong>${dateExpiration}</strong>.</p>
-        <p>Référence virement : <strong>${tapisId}</strong></p>
-        <p><em>Quand vous recevez le virement, passez le statut du tapis à "vendu" dans Sanity Studio.</em></p>
+        <p>Le client doit virer avant le <strong>${dateExpiration}</strong>.</p>
+        <p>Référence : <strong>${tapisId}</strong></p>
       `,
     });
 
-    // 6. Email au client
     const ribNom = process.env.MADELEINE_RIB_NOM || "Madeleine Benifei";
     const ribIban = process.env.MADELEINE_RIB_IBAN || "FR76 XXXX XXXX XXXX XXXX XXXX XXX";
     const ribBic = process.env.MADELEINE_RIB_BIC || "XXXXXXXX";
@@ -110,7 +105,7 @@ export async function POST(request: Request) {
         <p>Votre tapis <strong>${tapis.name}</strong> (Ø${tapis.diametre}cm) est réservé jusqu'au <strong>${dateExpiration}</strong>.</p>
         <p><strong>Prix : ${priceFormatted}</strong></p>
         <hr/>
-        <h3>Coordonnées bancaires pour le virement</h3>
+        <h3>Coordonnées bancaires</h3>
         <table style="border-collapse:collapse;">
           <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Titulaire</td><td>${ribNom}</td></tr>
           <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">IBAN</td><td>${ribIban}</td></tr>
@@ -119,8 +114,7 @@ export async function POST(request: Request) {
           <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Montant</td><td>${priceFormatted}</td></tr>
         </table>
         <hr/>
-        <p>⚠️ <strong>Important :</strong> Sans virement reçu avant le ${dateExpiration}, le tapis sera automatiquement remis en vente.</p>
-        <p>Dès réception de votre virement, vous recevrez un email de confirmation d'expédition.</p>
+        <p>⚠️ Sans virement avant le ${dateExpiration}, le tapis sera remis en vente.</p>
         <br/>
         <p>Cordialement,<br/>Madeleine Benifei<br/>Les Tapis Boules du Charollais</p>
       `,

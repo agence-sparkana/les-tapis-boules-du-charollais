@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
-import { client, writeClient } from "@/lib/sanity/client";
+
 export async function POST(request: Request) {
   try {
+    const { client, writeClient } = await import("@/lib/sanity/client");
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
+
     const { tapisId } = await request.json();
 
     if (!tapisId) {
       return NextResponse.json({ error: "tapisId requis" }, { status: 400 });
     }
 
-    // Récupérer le tapis et les infos client
     const tapis = await client.fetch(
       `*[_type == "tapis" && _id == $id][0]{
         _id, name, prix, diametre, statut,
@@ -23,7 +24,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tapis introuvable" }, { status: 404 });
     }
 
-    // Patcher Sanity : statut → vendu
     await writeClient
       .patch(tapisId)
       .set({ statut: "vendu" })
@@ -37,7 +37,6 @@ export async function POST(request: Request) {
       minimumFractionDigits: 0,
     }).format(tapis.prix);
 
-    // Email au client
     if (tapis.reservedByEmail) {
       await resend.emails.send({
         from: fromEmail,
@@ -47,14 +46,12 @@ export async function POST(request: Request) {
           <h2>Votre virement a été reçu !</h2>
           <p>Merci ${tapis.reservedByName || ""} ! Votre paiement pour le tapis <strong>${tapis.name}</strong> (${priceFormatted}) a bien été reçu.</p>
           <p>Votre tapis sera expédié sous <strong>3 à 5 jours ouvrés</strong> depuis Rigny-sur-Arroux, Bourgogne.</p>
-          <p>Vous recevrez un email avec le numéro de suivi dès l'expédition.</p>
           <br/>
           <p>Cordialement,<br/>Madeleine Benifei<br/>Les Tapis Boules du Charollais</p>
         `,
       });
     }
 
-    // Email à Madeleine
     await resend.emails.send({
       from: fromEmail,
       to: madeleineEmail,
