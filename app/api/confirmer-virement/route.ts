@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { client, writeClient } from "@/lib/sanity/client";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: Request) {
   try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { tapisId } = await request.json();
 
     if (!tapisId) {

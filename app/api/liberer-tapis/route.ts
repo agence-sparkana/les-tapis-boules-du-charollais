@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
 import { client, writeClient } from "@/lib/sanity/client";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function GET(request: Request) {
   // Vérifier le secret cron (Vercel envoie le header Authorization)
   const authHeader = request.headers.get("authorization");
@@ -12,6 +8,8 @@ export async function GET(request: Request) {
   }
 
   try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const now = new Date().toISOString();
 
     // Trouver tous les tapis réservés dont la réservation a expiré
