@@ -53,9 +53,18 @@ export default function CollectionSection({ tapis }: CollectionSectionProps) {
         {/* Grille produits */}
         {activeTab === "naturelle" ? (
           filtered.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-              {filtered.map((t) => (
-                <ProductCard key={t._id} tapis={t} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+              {filtered.map((t, i) => (
+                <div
+                  key={t._id}
+                  style={{
+                    animation: "fadeInUp 0.5s ease forwards",
+                    animationDelay: `${i * 0.1}s`,
+                    opacity: 0,
+                  }}
+                >
+                  <ProductCard tapis={t} index={i} />
+                </div>
               ))}
             </div>
           ) : (

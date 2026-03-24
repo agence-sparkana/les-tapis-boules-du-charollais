@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import ProductActions from "./ProductActions";
 import ProductCard from "@/components/ProductCard";
-import Badge from "@/components/Badge";
 import { formatPrice, getTimeRemaining, getExpiresAt } from "@/lib/utils";
 import { mockTapis } from "@/lib/mock-data";
+import TapisGallery from "./TapisGallery";
 
 // En production :
 // import { getTapisBySlug, getRelatedTapis, getAllTapisSlugs } from "@/lib/sanity/queries";
@@ -47,43 +46,13 @@ export default async function TapisPage({ params }: Props) {
       ? getTimeRemaining(getExpiresAt(tapis.reservedAt)).text
       : undefined;
 
+  const photos = ["/hero-tapis.jpg", "/boules-fleur.jpg", "/tapis-en-cours.jpg"];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
         {/* Galerie photos */}
-        <div>
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-beige-mid">
-            <Image
-              src="/hero-tapis.jpg"
-              alt={tapis.name}
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
-          {/* Miniatures */}
-          <div className="flex gap-3 mt-4">
-            {["/hero-tapis.jpg", "/boules-fleur.jpg", "/tapis-en-cours.jpg"].map(
-              (src, i) => (
-                <button
-                  key={i}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 ${
-                    i === 0 ? "border-terre" : "border-beige-dark"
-                  } hover:border-terre transition-colors`}
-                >
-                  <Image
-                    src={src}
-                    alt={`${tapis.name} - vue ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                </button>
-              )
-            )}
-          </div>
-        </div>
+        <TapisGallery photos={photos} name={tapis.name} />
 
         {/* Infos produit */}
         <div>
@@ -98,7 +67,21 @@ export default async function TapisPage({ params }: Props) {
             <span className="text-2xl font-display text-terre font-bold">
               {formatPrice(tapis.prix)}
             </span>
-            <Badge statut={tapis.statut} countdown={countdown} size="md" />
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white"
+              style={{
+                background: "rgba(61, 32, 16, 0.75)",
+                borderRadius: 20,
+              }}
+            >
+              {tapis.statut === "réservé" && (
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              )}
+              {tapis.statut === "disponible" ? "Disponible" : tapis.statut === "réservé" ? `Réservé${countdown ? ` — ${countdown}` : " 48h"}` : "Vendu"}
+            </span>
           </div>
 
           <div className="mt-4 text-sm text-text-muted">
@@ -155,9 +138,18 @@ export default async function TapisPage({ params }: Props) {
           <h2 className="font-display text-marron text-xl sm:text-2xl font-bold mb-8">
             Vous aimerez aussi
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {related.map((t) => (
-              <ProductCard key={t._id} tapis={t} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {related.map((t, i) => (
+              <div
+                key={t._id}
+                style={{
+                  animation: "fadeInUp 0.5s ease forwards",
+                  animationDelay: `${i * 0.1}s`,
+                  opacity: 0,
+                }}
+              >
+                <ProductCard tapis={t} index={i} />
+              </div>
             ))}
           </div>
         </div>

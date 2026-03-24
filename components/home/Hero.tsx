@@ -1,7 +1,23 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (!imageRef.current) return;
+      const scrollY = window.scrollY;
+      const offset = Math.min(scrollY * 0.15, 20);
+      imageRef.current.style.transform = `translateY(-${offset}px)`;
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <section className="bg-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
@@ -68,28 +84,28 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Droite — photo ronde */}
+          {/* Droite — photo arrondie avec parallax */}
           <div className="relative flex items-center justify-center">
             <div
-              className="rounded-full p-3"
+              ref={imageRef}
+              className="relative overflow-hidden"
               style={{
                 width: 480,
                 height: 480,
-                background: '#D9CCBB',
-                maxWidth: '100%',
-                aspectRatio: '1 / 1',
+                maxWidth: "100%",
+                aspectRatio: "1 / 1",
+                borderRadius: 12,
+                transition: "transform 0.1s linear",
               }}
             >
-              <div className="relative w-full h-full rounded-full overflow-hidden shadow-lg">
-                <Image
-                  src="/hero-tapis.jpg"
-                  alt="Tapis rond en boules de laine feutrée, vue de dessus sur parquet"
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 480px"
-                />
-              </div>
+              <Image
+                src="/hero-tapis.jpg"
+                alt="Tapis rond en boules de laine feutrée, vue de dessus sur parquet"
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 480px"
+              />
             </div>
             {/* Badge overlay */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-sm">
