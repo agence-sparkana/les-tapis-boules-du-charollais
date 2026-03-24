@@ -69,15 +69,26 @@ export default defineType({
         ],
       },
       initialValue: "disponible",
-      readOnly: true,
-      description: "Géré automatiquement par le site — ne pas modifier manuellement.",
+      description:
+        "Géré automatiquement par le site. Vous pouvez passer manuellement à 'vendu' quand le virement est reçu.",
     }),
     defineField({
-      name: "reservedAt",
-      title: "Réservé le",
+      name: "reservedUntil",
+      title: "Réservé jusqu'au",
       type: "datetime",
-      readOnly: true,
-      description: "Horodatage de la réservation — géré automatiquement.",
+      description: "Date d'expiration de la réservation (48h après commande).",
+    }),
+    defineField({
+      name: "reservedByEmail",
+      title: "Email du client",
+      type: "string",
+      description: "Email du client qui a réservé ce tapis.",
+    }),
+    defineField({
+      name: "reservedByName",
+      title: "Nom du client",
+      type: "string",
+      description: "Nom du client qui a réservé ce tapis.",
     }),
   ],
   preview: {
@@ -88,7 +99,11 @@ export default defineType({
     },
     prepare({ title, subtitle, media }) {
       const emoji =
-        subtitle === "disponible" ? "🟢" : subtitle === "réservé" ? "🟠" : "🔴";
+        subtitle === "disponible"
+          ? "🟢"
+          : subtitle === "réservé"
+          ? "🟠"
+          : "🔴";
       return {
         title: `${emoji} ${title}`,
         subtitle: `${subtitle}`,
