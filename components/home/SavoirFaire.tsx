@@ -59,7 +59,7 @@ export default function SavoirFaire() {
           </div>
 
           {/* Droite — photo */}
-          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden">
+          <div className="relative aspect-[4/5] overflow-hidden" style={{ borderRadius: 12 }}>
             <Image
               src="/boules-fleur.jpg"
               alt="Boules de laine feutrée en cours de fabrication"

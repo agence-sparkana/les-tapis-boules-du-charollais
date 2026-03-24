@@ -109,7 +109,7 @@ export default function ProductActions({ tapis }: ProductActionsProps) {
         disabled={loading}
         className="w-full py-3 px-6 bg-terre text-white font-medium rounded-lg hover:bg-terre-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
       >
-        {loading ? "Réservation en cours..." : "Ajouter au panier — Réservé 48h"}
+        {loading ? "Réservation en cours..." : "Réserver 48h — paiement par virement"}
       </button>
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>

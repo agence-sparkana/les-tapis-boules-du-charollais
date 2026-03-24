@@ -24,20 +24,19 @@ export default function CommentCommander() {
     },
     {
       num: "03",
-      title: "Livré chez vous avec soin",
-      desc: "Paiement sécurisé par carte. Votre tapis est emballé avec soin et expédié depuis la Bourgogne.",
+      title: "Commandez par virement",
+      desc: "Validez votre commande et réglez par virement bancaire. Votre tapis est expédié depuis la Bourgogne avec soin.",
       icon: (
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="1" y="6" width="22" height="14" rx="2" />
           <path d="M1 10h22" />
-          <path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2" />
         </svg>
       ),
     },
   ];
 
   return (
-    <section className="bg-beige-mid py-16 sm:py-20">
+    <section style={{ background: "#EDE4D6" }} className="py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="font-display text-marron text-2xl sm:text-3xl font-bold">
