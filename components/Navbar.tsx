@@ -40,9 +40,11 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="Les Tapis Boules du Charollais"
-              width={64}
-              height={64}
+              width={200}
+              height={200}
+              quality={100}
               className="object-contain"
+              style={{ width: "120px", height: "auto" }}
             />
           </Link>
 
